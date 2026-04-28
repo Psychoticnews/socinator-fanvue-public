@@ -1,0 +1,167 @@
+<UserControl
+    x:Class="FanvueDominatorUI.Views.Engage.MassMessagesControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:FanvueDominatorUI.ViewModels.Engage"
+    mc:Ignorable="d"
+    d:DesignHeight="600"
+    d:DesignWidth="900">
+    <UserControl.DataContext>
+        <vm:MassMessagesViewModel />
+    </UserControl.DataContext>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  Background="{DynamicResource UserControlBackgroundBrush}">
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Margin="0,0,8,0"
+                               Foreground="{DynamicResource TextColorBrushAccordingTheme}"
+                               Text="{DynamicResource LangKeyAccount}" />
+                    <ComboBox Width="220"
+                              ItemsSource="{Binding Accounts}"
+                              SelectedItem="{Binding SelectedAccount}"
+                              DisplayMemberPath="Display" />
+                </StackPanel>
+                <Button Grid.Column="1" Padding="14,4"
+                        Command="{Binding RefreshCommand}"
+                        Content="{DynamicResource LangKeyRefresh}" />
+            </Grid>
+
+            <Expander Grid.Row="1" Header="Compose" IsExpanded="True"
+                      Foreground="{DynamicResource TextColorBrushAccordingTheme}">
+                <StackPanel Margin="6,8,6,8">
+                    <TextBlock Foreground="{DynamicResource TextColorBrushAccordingTheme}" Text="Template" />
+                    <ComboBox Margin="0,2,0,8"
+                              ItemsSource="{Binding Templates}"
+                              SelectedItem="{Binding SelectedTemplate}"
+                              DisplayMemberPath="Text" />
+
+                    <TextBlock Foreground="{DynamicResource TextColorBrushAccordingTheme}" Text="Message" />
+                    <TextBox Margin="0,2,0,8"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             MinHeight="80"
+                             Text="{Binding MessageText, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,4,0">
+                            <TextBlock Foreground="{DynamicResource TextColorBrushAccordingTheme}" Text="Price (cents, optional)" />
+                            <TextBox Margin="0,2,0,0"
+                                     Text="{Binding Price, UpdateSourceTrigger=PropertyChanged, TargetNullValue=''}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                            <TextBlock Foreground="{DynamicResource TextColorBrushAccordingTheme}" Text="Media UUIDs (CSV, optional)" />
+                            <TextBox Margin="0,2,0,0"
+                                     Text="{Binding MediaUuidsCsv, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Margin="0,8,0,0"
+                               Foreground="{DynamicResource TextColorBrushAccordingTheme}"
+                               Text="Schedule (leave empty to send now)" />
+                    <Controls:DateTimePicker Margin="0,2,0,0"
+                                             SelectedDate="{Binding ScheduledAt, Mode=TwoWay}" />
+                </StackPanel>
+            </Expander>
+
+            <Expander Grid.Row="2" Header="Audience" IsExpanded="True" Margin="0,6,0,0"
+                      Foreground="{DynamicResource TextColorBrushAccordingTheme}">
+                <Grid Margin="6,8,6,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock FontWeight="Bold" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextColorBrushAccordingTheme}"
+                                   Text="Smart Lists" />
+                        <ItemsControl ItemsSource="{Binding SmartLists}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Margin="0,2"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}">
+                                        <TextBlock>
+                                            <Run Text="{Binding Name}" />
+                                            <Run Text=" (" /><Run Text="{Binding Count}" /><Run Text=")" />
+                                        </TextBlock>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock FontWeight="Bold" Margin="0,0,0,4"
+                                   Foreground="{DynamicResource TextColorBrushAccordingTheme}"
+                                   Text="Custom Lists" />
+                        <ItemsControl ItemsSource="{Binding CustomLists}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Margin="0,2"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}">
+                                        <TextBlock>
+                                            <Run Text="{Binding Name}" />
+                                            <Run Text=" (" /><Run Text="{Binding MemberCount}" /><Run Text=")" />
+                                        </TextBlock>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+            </Expander>
+
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,10,0,10">
+                <Button Padding="14,4" Margin="0,0,8,0"
+                        Command="{Binding SendCommand}"
+                        Content="Send / Schedule" />
+                <Button Padding="14,4" Margin="0,0,8,0"
+                        Command="{Binding UpdateCommand}"
+                        Content="Update Selected" />
+                <Button Padding="14,4"
+                        Command="{Binding DeleteCommand}"
+                        Content="Delete Selected" />
+            </StackPanel>
+
+            <Expander Grid.Row="4" Header="Mass Messages" IsExpanded="True"
+                      Foreground="{DynamicResource TextColorBrushAccordingTheme}">
+                <DataGrid Margin="0,8,0,0"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          ItemsSource="{Binding MassMessages}"
+                          SelectedItem="{Binding SelectedRow}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" />
+                        <DataGridTextColumn Header="Text" Binding="{Binding Text}" Width="*" />
+                        <DataGridTextColumn Header="Recipients" Binding="{Binding RecipientCount}" Width="100" />
+                        <DataGridTextColumn Header="Scheduled" Binding="{Binding ScheduledAt, StringFormat='{}{0:g}'}" Width="140" />
+                        <DataGridTextColumn Header="Created" Binding="{Binding CreatedAt, StringFormat='{}{0:g}'}" Width="140" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Expander>
+
+            <TextBlock Grid.Row="5" Margin="0,8,0,0"
+                       Foreground="{DynamicResource TextColorBrushAccordingTheme}"
+                       Text="{Binding StatusMessage}" />
+        </Grid>
+    </ScrollViewer>
+</UserControl>

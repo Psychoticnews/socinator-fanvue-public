@@ -1,0 +1,42 @@
+<Window x:Class="FanvueDominatorUI.Views.Notifications.NotificationToast"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Width="360"
+        Height="80"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        Focusable="False"
+        ShowActivated="False">
+    <Border Background="{DynamicResource AccentBaseColorBrush}"
+            CornerRadius="6"
+            Padding="14,10,14,10">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="14"
+                              ShadowDepth="2"
+                              Opacity="0.5"
+                              Color="Black" />
+        </Border.Effect>
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock x:Name="TitleText"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Foreground="White"
+                       TextTrimming="CharacterEllipsis" />
+            <TextBlock x:Name="BodyText"
+                       FontSize="12"
+                       Foreground="White"
+                       Opacity="0.9"
+                       Margin="0,2,0,0"
+                       TextWrapping="Wrap"
+                       MaxHeight="36"
+                       TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+    </Border>
+</Window>

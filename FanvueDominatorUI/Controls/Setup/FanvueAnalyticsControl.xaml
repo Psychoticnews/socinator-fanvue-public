@@ -1,0 +1,387 @@
+<UserControl
+    x:Class="FanvueDominatorUI.Controls.Setup.FanvueAnalyticsControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <UserControl.Resources>
+        <!-- Stat Card Style -->
+        <Style x:Key="StatCardBorder" TargetType="Border">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="20,15"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+        </Style>
+
+        <Style x:Key="StatLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="#888888"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+
+        <Style x:Key="StatValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="15">
+
+                <!-- Header Row -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock x:Name="TxtAccountName"
+                                   Text="Analytics Dashboard"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Foreground="White"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <Ellipse x:Name="ConnectionIndicator"
+                                     Width="8" Height="8"
+                                     Fill="#6C757D"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,8,0"/>
+                            <TextBlock x:Name="TxtConnectionStatus"
+                                       Text="Not connected"
+                                       FontSize="12"
+                                       Foreground="#888888"/>
+                            <TextBlock x:Name="TxtLastUpdated"
+                                       Text=""
+                                       FontSize="12"
+                                       Foreground="#555555"
+                                       Margin="15,0,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            x:Name="BtnRefreshAll"
+                            Click="BtnRefreshAll_Click"
+                            Height="36"
+                            Padding="20,0"
+                            Background="#EE6544"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#x21BB;" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Refresh" FontSize="13" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <!-- Key Stats Row -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Followers Card -->
+                    <Border Grid.Column="0" Style="{StaticResource StatCardBorder}">
+                        <StackPanel>
+                            <TextBlock Text="FOLLOWERS" Style="{StaticResource StatLabel}"/>
+                            <TextBlock x:Name="TxtFollowerCount" Text="--" Style="{StaticResource StatValue}" Foreground="#3897F0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Subscribers Card -->
+                    <Border Grid.Column="1" Style="{StaticResource StatCardBorder}">
+                        <StackPanel>
+                            <TextBlock Text="SUBSCRIBERS" Style="{StaticResource StatLabel}"/>
+                            <TextBlock x:Name="TxtSubscriberCount" Text="--" Style="{StaticResource StatValue}" Foreground="#FFC107"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Total Revenue Card -->
+                    <Border Grid.Column="2" Style="{StaticResource StatCardBorder}">
+                        <StackPanel>
+                            <TextBlock Text="TOTAL REVENUE" Style="{StaticResource StatLabel}"/>
+                            <TextBlock x:Name="TxtTotalEarnings" Text="--" Style="{StaticResource StatValue}" Foreground="#28A745"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- This Month Card -->
+                    <Border Grid.Column="3" Style="{StaticResource StatCardBorder}" Margin="0">
+                        <StackPanel>
+                            <TextBlock Text="THIS MONTH" Style="{StaticResource StatLabel}"/>
+                            <TextBlock x:Name="TxtMonthEarnings" Text="--" Style="{StaticResource StatValue}" Foreground="#EE6544"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Earnings Breakdown -->
+                <Border Background="#2D2D30" CornerRadius="8" Padding="20" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="Earnings Breakdown" FontSize="14" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,15"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Gross Revenue" FontSize="11" Foreground="#888888"/>
+                                <TextBlock x:Name="TxtGrossEarnings" Text="$0.00" FontSize="18" FontWeight="SemiBold" Foreground="#28A745" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Net Earnings (After Fees)" FontSize="11" Foreground="#888888"/>
+                                <TextBlock x:Name="TxtNetEarnings" Text="$0.00" FontSize="18" FontWeight="SemiBold" Foreground="#23D979" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Platform Fees (~20%)" FontSize="11" Foreground="#888888"/>
+                                <TextBlock x:Name="TxtPlatformFees" Text="$0.00" FontSize="18" FontWeight="SemiBold" Foreground="#FF6B6B" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Vault Section -->
+                <Border x:Name="VaultStatsPanel" Background="#2D2D30" CornerRadius="8" Padding="20" Margin="0,0,0,15" Visibility="Collapsed">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Vault" FontSize="14" FontWeight="SemiBold" Foreground="White"/>
+                            <TextBlock Grid.Column="1" x:Name="TxtTotalMedia" Text="" FontSize="12" Foreground="#888888"/>
+                        </Grid>
+
+                        <!-- Media Type Summary -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                <TextBlock Text="IMAGES" FontSize="10" Foreground="#666666" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="TxtImageCount" Text="0" FontSize="20" FontWeight="Bold" Foreground="#3897F0" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                <TextBlock Text="VIDEOS" FontSize="10" Foreground="#666666" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="TxtVideoCount" Text="0" FontSize="20" FontWeight="Bold" Foreground="#EE6544" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                <TextBlock Text="AUDIO" FontSize="10" Foreground="#666666" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="TxtAudioCount" Text="0" FontSize="20" FontWeight="Bold" Foreground="#9B59B6" HorizontalAlignment="Center" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Folders List -->
+                        <TextBlock Text="Folders" FontSize="12" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,5,0,8"/>
+                        <Border Background="#252528" CornerRadius="4" MaxHeight="160">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="FoldersList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="12,10" BorderBrush="#333333" BorderThickness="0,0,0,1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Folder Icon -->
+                                                    <Border Grid.Column="0" Width="28" Height="28" CornerRadius="4" Background="#3D3D40" Margin="0,0,12,0">
+                                                        <TextBlock Text="&#128193;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+
+                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" Foreground="White" VerticalAlignment="Center"/>
+
+                                                    <Border Grid.Column="2" Background="#3897F0" CornerRadius="10" Padding="8,3">
+                                                        <TextBlock Text="{Binding MediaCount}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                        <TextBlock x:Name="TxtNoFolders" Text="No folders" FontSize="11" Foreground="#555555" Margin="0,8,0,0" HorizontalAlignment="Center" Visibility="Collapsed"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Recent Activity Section -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Recent Followers -->
+                    <Border Grid.Column="0" Background="#2D2D30" CornerRadius="8" Padding="15" Margin="0,0,7,0">
+                        <StackPanel>
+                            <TextBlock Text="Recent Followers" FontSize="13" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,10"/>
+
+                            <Border Background="#252528" CornerRadius="4" MaxHeight="180">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl x:Name="FollowersList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="10,8" BorderBrush="#333333" BorderThickness="0,0,0,1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding Username}" FontSize="12" Foreground="#3897F0"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding FollowedAt}" FontSize="10" Foreground="#666666"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+
+                            <TextBlock x:Name="TxtNoFollowers" Text="No recent followers" FontSize="11" Foreground="#555555" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Recent Subscribers -->
+                    <Border Grid.Column="1" Background="#2D2D30" CornerRadius="8" Padding="15" Margin="8,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Recent Subscribers" FontSize="13" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,10"/>
+
+                            <Border Background="#252528" CornerRadius="4" MaxHeight="180">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl x:Name="SubscribersList">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="10,8" BorderBrush="#333333" BorderThickness="0,0,0,1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding Username}" FontSize="12" Foreground="#FFC107"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding SubscribedAt}" FontSize="10" Foreground="#666666"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+
+                            <TextBlock x:Name="TxtNoSubscribers" Text="No recent subscribers" FontSize="11" Foreground="#555555" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Messages Section -->
+                <Border Background="#2D2D30" CornerRadius="8" Padding="15" Margin="0,15,0,0">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Recent Messages" FontSize="13" FontWeight="SemiBold" Foreground="White"/>
+                            <TextBlock Grid.Column="1" x:Name="TxtChatCount" Text="" FontSize="12" Foreground="#888888"/>
+                        </Grid>
+
+                        <Border Background="#252528" CornerRadius="4" MaxHeight="200">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="ChatsList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Padding="12,10" BorderBrush="#333333" BorderThickness="0,0,0,1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Avatar placeholder -->
+                                                    <Border Grid.Column="0" Width="32" Height="32" CornerRadius="16" Background="#3897F0" Margin="0,0,12,0">
+                                                        <TextBlock Text="{Binding Initial}" FontSize="14" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    </Border>
+
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Username}" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                                                        <TextBlock Text="{Binding LastMessage}" FontSize="11" Foreground="#888888" TextTrimming="CharacterEllipsis" MaxWidth="300"/>
+                                                    </StackPanel>
+
+                                                    <TextBlock Grid.Column="2" Text="{Binding Time}" FontSize="10" Foreground="#555555" VerticalAlignment="Top"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+
+                        <TextBlock x:Name="TxtNoMessages" Text="No recent messages" FontSize="11" Foreground="#555555" Margin="0,10,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Profile Info (Collapsed by default, shown in compact form) -->
+                <Border x:Name="ProfileInfoBorder" Background="#2D2D30" CornerRadius="8" Padding="15" Margin="0,15,0,0" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Username" FontSize="10" Foreground="#666666"/>
+                            <TextBlock x:Name="TxtUsername" Text="--" FontSize="12" Foreground="#3897F0" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Display Name" FontSize="10" Foreground="#666666"/>
+                            <TextBlock x:Name="TxtDisplayName" Text="--" FontSize="12" Foreground="White" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Email" FontSize="10" Foreground="#666666"/>
+                            <TextBlock x:Name="TxtEmail" Text="--" FontSize="12" Foreground="White" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Account Type" FontSize="10" Foreground="#666666"/>
+                            <TextBlock x:Name="TxtAccountType" Text="--" FontSize="12" Foreground="White" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Loading Overlay -->
+        <Border x:Name="LoadingOverlay" Background="#80000000" Visibility="Collapsed">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Loading..." FontSize="16" Foreground="White" HorizontalAlignment="Center"/>
+                <TextBlock x:Name="TxtLoadingStatus" Text="Fetching data..." FontSize="12" Foreground="#888888" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

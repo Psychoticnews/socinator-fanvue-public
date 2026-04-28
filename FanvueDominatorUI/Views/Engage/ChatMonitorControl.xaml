@@ -1,0 +1,654 @@
+<UserControl
+    x:Class="FanvueDominatorUI.Views.Engage.ChatMonitorControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:FanvueDominatorUI.ViewModels.Engage"
+    mc:Ignorable="d"
+    d:DesignHeight="600"
+    d:DesignWidth="900">
+    <UserControl.DataContext>
+        <vm:ChatMonitorViewModel />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <!-- Color tokens (chat-app palette) -->
+        <SolidColorBrush x:Key="FvBgBase" Color="#1E1E1E" />
+        <SolidColorBrush x:Key="FvBgPanel" Color="#252528" />
+        <SolidColorBrush x:Key="FvBgRow" Color="#2D2D30" />
+        <SolidColorBrush x:Key="FvBgRowSelected" Color="#3D3D40" />
+        <SolidColorBrush x:Key="FvBgRowHover" Color="#353538" />
+        <SolidColorBrush x:Key="FvBorderSubtle" Color="#3D3D40" />
+        <SolidColorBrush x:Key="FvTextPrimary" Color="#E0E0E0" />
+        <SolidColorBrush x:Key="FvTextSecondary" Color="#B0B0B0" />
+        <SolidColorBrush x:Key="FvTextMuted" Color="#888888" />
+        <SolidColorBrush x:Key="FvAccent" Color="#4CAF50" />
+        <SolidColorBrush x:Key="FvBubbleInbound" Color="#3A3A3D" />
+        <SolidColorBrush x:Key="FvBubbleOutbound" Color="#0078D4" />
+        <SolidColorBrush x:Key="FvDanger" Color="#F44336" />
+        <SolidColorBrush x:Key="FvComposerBg" Color="#252528" />
+        <SolidColorBrush x:Key="FvWhite" Color="#FFFFFF" />
+
+        <!-- Conversation row template (selectable, hover) -->
+        <Style x:Key="ConversationRowStyle" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource FvTextPrimary}" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Grid Background="{TemplateBinding Background}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="AccentBar" Grid.Column="0" Background="Transparent" />
+                            <ContentPresenter Grid.Column="1" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource FvBgRowHover}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{StaticResource FvBgRowSelected}" />
+                                <Setter TargetName="AccentBar" Property="Background" Value="{StaticResource FvAccent}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Composer textbox style -->
+        <Style x:Key="ComposerTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource FvComposerBg}" />
+            <Setter Property="Foreground" Value="{StaticResource FvTextPrimary}" />
+            <Setter Property="CaretBrush" Value="{StaticResource FvTextPrimary}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FvBorderSubtle}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="MaxHeight" Value="120" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="8"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Send button style: green circle, paper plane icon -->
+        <Style x:Key="SendButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Background" Value="{StaticResource FvAccent}" />
+            <Setter Property="Foreground" Value="{StaticResource FvWhite}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Ellipse x:Name="Bg" Fill="{TemplateBinding Background}" />
+                            <Path x:Name="Icon"
+                                  Width="16" Height="16"
+                                  Stretch="Uniform"
+                                  Fill="{TemplateBinding Foreground}"
+                                  Data="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Fill" Value="#5DBE60" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Bg" Property="Fill" Value="#3A3A3D" />
+                                <Setter TargetName="Icon" Property="Fill" Value="#666" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Header action button (Mark Read / Mute) -->
+        <Style x:Key="HeaderActionButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource FvTextSecondary}" />
+            <Setter Property="BorderBrush" Value="{StaticResource FvBorderSubtle}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,4" />
+            <Setter Property="Margin" Value="4,0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="4"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource FvBgRowHover}" />
+                    <Setter Property="Foreground" Value="{StaticResource FvTextPrimary}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource FvBgBase}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- TOP STRIP: Account + counters + refresh -->
+        <Border Grid.Row="0" Background="{StaticResource FvBgPanel}"
+                BorderBrush="{StaticResource FvBorderSubtle}"
+                BorderThickness="0,0,0,1"
+                Padding="14,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Margin="0,0,8,0"
+                               FontSize="12"
+                               Foreground="{StaticResource FvTextSecondary}"
+                               Text="Account" />
+                    <ComboBox Width="240"
+                              ItemsSource="{Binding Accounts}"
+                              SelectedItem="{Binding SelectedAccount}"
+                              DisplayMemberPath="Display" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="20,0,0,0" VerticalAlignment="Center">
+                    <Border Background="{StaticResource FvBgRow}" CornerRadius="12" Padding="10,4" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" FontSize="11"
+                                       Foreground="{StaticResource FvTextMuted}"
+                                       Text="Unread chats" />
+                            <TextBlock VerticalAlignment="Center" Margin="6,0,0,0"
+                                       FontWeight="SemiBold" FontSize="12"
+                                       Foreground="{StaticResource FvAccent}"
+                                       Text="{Binding UnreadChats}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Background="{StaticResource FvBgRow}" CornerRadius="12" Padding="10,4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" FontSize="11"
+                                       Foreground="{StaticResource FvTextMuted}"
+                                       Text="Unread messages" />
+                            <TextBlock VerticalAlignment="Center" Margin="6,0,0,0"
+                                       FontWeight="SemiBold" FontSize="12"
+                                       Foreground="{StaticResource FvAccent}"
+                                       Text="{Binding UnreadMessages}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+                <!-- #W.UI — live poll indicator. Color reflects current poll cadence; tooltip
+                     surfaces the most recent poll outcome. Code-behind subscribes to the poller's
+                     IntervalChanged event and refreshes on a per-second timer for the tooltip. -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                    <Ellipse x:Name="LivePollDot"
+                             Width="10" Height="10"
+                             VerticalAlignment="Center"
+                             Margin="0,0,8,0"
+                             Fill="#888888"
+                             ToolTip="Polling status (loading)" />
+                    <Button Style="{StaticResource HeaderActionButtonStyle}"
+                            Padding="14,5"
+                            Command="{Binding LoadConversationsCommand}"
+                            Content="Refresh" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- MAIN: conversation list + thread -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT: conversation list -->
+            <Border Grid.Column="0" Background="{StaticResource FvBgPanel}"
+                    BorderBrush="{StaticResource FvBorderSubtle}"
+                    BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Search box with overlay watermark -->
+                    <Grid Grid.Row="0" Margin="10,10,10,4">
+                        <TextBox x:Name="SearchBox" Padding="10,6"
+                                 FontSize="12"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="{StaticResource FvBgRow}"
+                                 Foreground="{StaticResource FvTextPrimary}"
+                                 CaretBrush="{StaticResource FvTextPrimary}"
+                                 BorderBrush="{StaticResource FvBorderSubtle}"
+                                 BorderThickness="1" />
+                        <TextBlock IsHitTestVisible="False"
+                                   Margin="14,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontSize="12"
+                                   Foreground="{StaticResource FvTextMuted}"
+                                   Text="Search conversations">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    <!-- Filter chips -->
+                    <ItemsControl Grid.Row="1" Margin="10,0,10,6"
+                                  ItemsSource="{Binding FilterChips}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ToggleButton Margin="0,2,4,2" Padding="10,3"
+                                              Content="{Binding Label}"
+                                              IsChecked="{Binding IsActive, Mode=TwoWay}"
+                                              Command="{Binding DataContext.ToggleFilterCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                              CommandParameter="{Binding}"
+                                              FontSize="11"
+                                              Foreground="{StaticResource FvTextSecondary}"
+                                              Background="{StaticResource FvBgRow}"
+                                              BorderBrush="{StaticResource FvBorderSubtle}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Conversation list -->
+                    <ListBox Grid.Row="2"
+                             ItemsSource="{Binding Conversations}"
+                             SelectedItem="{Binding SelectedConversation}"
+                             ItemContainerStyle="{StaticResource ConversationRowStyle}"
+                             BorderThickness="0"
+                             HorizontalContentAlignment="Stretch"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             Background="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Height="64" Margin="0" Background="Transparent">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Avatar with online dot -->
+                                    <Grid Grid.Column="0" Width="44" Height="44" Margin="12,0,10,0" VerticalAlignment="Center">
+                                        <Border CornerRadius="22"
+                                                Background="{StaticResource FvBgRow}"
+                                                BorderBrush="{StaticResource FvBorderSubtle}"
+                                                BorderThickness="1"
+                                                ClipToBounds="True">
+                                            <Image Stretch="UniformToFill"
+                                                   Source="{Binding AvatarUrl, TargetNullValue={x:Null}, FallbackValue={x:Null}}" />
+                                        </Border>
+                                        <Ellipse Width="11" Height="11"
+                                                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                 Stroke="{StaticResource FvBgPanel}" StrokeThickness="2">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Setter Property="Fill" Value="Transparent" />
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                                                            <Setter Property="Fill" Value="{StaticResource FvAccent}" />
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                    </Grid>
+
+                                    <!-- Name + preview -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontWeight="SemiBold" FontSize="14"
+                                                       Foreground="{StaticResource FvWhite}"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Text="{Binding DisplayName}" />
+                                            <Border Margin="6,0,0,0" Padding="5,1"
+                                                    VerticalAlignment="Center"
+                                                    CornerRadius="3"
+                                                    Background="#FFB300">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsTopSpender}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <TextBlock FontSize="9" FontWeight="Bold"
+                                                           Foreground="#1E1E1E"
+                                                           Text="VIP" />
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock FontSize="12" Margin="0,2,0,0"
+                                                   Foreground="{StaticResource FvTextSecondary}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Text="{Binding LastMessagePreview}" />
+                                    </StackPanel>
+
+                                    <!-- Right meta column: timestamp + unread -->
+                                    <StackPanel Grid.Column="2" Margin="6,0,12,0" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                        <TextBlock FontSize="11" HorizontalAlignment="Right"
+                                                   Foreground="{StaticResource FvTextMuted}"
+                                                   Text="{Binding LastMessageAt, StringFormat='{}{0:t}'}" />
+                                        <Border Margin="0,4,0,0" Padding="6,1"
+                                                HorizontalAlignment="Right"
+                                                MinWidth="20"
+                                                Background="{StaticResource FvDanger}"
+                                                CornerRadius="9">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding UnreadCount}" Value="0">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Foreground="White" FontSize="10" FontWeight="Bold"
+                                                       HorizontalAlignment="Center"
+                                                       Text="{Binding UnreadCount}" />
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- RIGHT: thread + composer -->
+            <Grid Grid.Column="1" Background="{StaticResource FvBgBase}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Thread header -->
+                <Border Grid.Row="0" Background="{StaticResource FvBgPanel}"
+                        BorderBrush="{StaticResource FvBorderSubtle}"
+                        BorderThickness="0,0,0,1"
+                        Padding="14,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Width="36" Height="36" CornerRadius="18"
+                                Background="{StaticResource FvBgRow}"
+                                BorderBrush="{StaticResource FvBorderSubtle}"
+                                BorderThickness="1"
+                                Margin="0,0,10,0"
+                                ClipToBounds="True">
+                            <Image Stretch="UniformToFill"
+                                   Source="{Binding SelectedConversation.AvatarUrl, TargetNullValue={x:Null}, FallbackValue={x:Null}}" />
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock FontWeight="SemiBold" FontSize="14"
+                                       Foreground="{StaticResource FvWhite}"
+                                       Text="{Binding SelectedConversation.DisplayName, FallbackValue='Select a conversation'}" />
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="8" Height="8" Margin="0,0,5,0" VerticalAlignment="Center">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Setter Property="Fill" Value="{StaticResource FvAccent}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedConversation.IsOnline}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                                <TextBlock FontSize="11"
+                                           Foreground="{StaticResource FvTextMuted}"
+                                           Text="{Binding SelectedConversation.Handle}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Style="{StaticResource HeaderActionButtonStyle}"
+                                    Command="{Binding MarkReadCommand}"
+                                    CommandParameter="{Binding SelectedConversation}"
+                                    Content="Mark Read" />
+                            <Button Style="{StaticResource HeaderActionButtonStyle}"
+                                    Command="{Binding ToggleMuteCommand}"
+                                    CommandParameter="{Binding SelectedConversation}"
+                                    Content="Mute" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Message thread -->
+                <ScrollViewer x:Name="ThreadScrollViewer" Grid.Row="1"
+                              Padding="14,10"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding Messages}"
+                                  HorizontalContentAlignment="Stretch"
+                                  Background="Transparent">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2,0,2">
+                                    <Border Padding="12,8"
+                                            CornerRadius="14"
+                                            MaxWidth="520">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                                <Setter Property="Background" Value="{StaticResource FvBubbleInbound}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsOutgoing}" Value="True">
+                                                        <Setter Property="HorizontalAlignment" Value="Right" />
+                                                        <Setter Property="Background" Value="{StaticResource FvBubbleOutbound}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <StackPanel>
+                                            <TextBlock TextWrapping="Wrap"
+                                                       FontSize="13"
+                                                       Foreground="{StaticResource FvWhite}"
+                                                       Text="{Binding Text}" />
+                                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                <Border Padding="4,1" Margin="0,0,6,0"
+                                                        VerticalAlignment="Center"
+                                                        CornerRadius="3"
+                                                        Background="{StaticResource FvAccent}">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsPaid}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock FontSize="9" FontWeight="Bold"
+                                                               Foreground="White"
+                                                               Text="{Binding PriceDisplay}" />
+                                                </Border>
+                                                <TextBlock FontSize="10" Margin="0,0,6,0"
+                                                           VerticalAlignment="Center"
+                                                           Foreground="#D0D0D0"
+                                                           Text="{Binding MediaType}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HasMedia}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock FontSize="10"
+                                                           VerticalAlignment="Center"
+                                                           Foreground="#C0C0C0"
+                                                           Text="{Binding SentAt, StringFormat='{}{0:t}'}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Shared media strip (collapsed when empty) -->
+                <Border Grid.Row="2" Background="{StaticResource FvBgPanel}"
+                        BorderBrush="{StaticResource FvBorderSubtle}"
+                        BorderThickness="0,1,0,0"
+                        Padding="14,8">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Media.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <StackPanel>
+                        <TextBlock FontSize="11" FontWeight="SemiBold" Margin="0,0,0,6"
+                                   Foreground="{StaticResource FvTextSecondary}"
+                                   Text="Shared Media" />
+                        <ItemsControl ItemsSource="{Binding Media}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,4,4" Width="64" Height="64"
+                                            CornerRadius="6"
+                                            BorderThickness="1"
+                                            BorderBrush="{StaticResource FvBorderSubtle}"
+                                            ClipToBounds="True">
+                                        <Image Stretch="UniformToFill">
+                                            <Image.Source>
+                                                <Binding Path="ThumbnailUrl" />
+                                            </Image.Source>
+                                        </Image>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Composer -->
+                <Border Grid.Row="3" Background="{StaticResource FvBgPanel}"
+                        BorderBrush="{StaticResource FvBorderSubtle}"
+                        BorderThickness="0,1,0,0"
+                        Padding="14,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" Margin="0,0,10,0">
+                            <TextBox x:Name="ComposerTextBox"
+                                     Style="{StaticResource ComposerTextBoxStyle}"
+                                     Text="{Binding ComposerText, UpdateSourceTrigger=PropertyChanged}"
+                                     KeyDown="ComposerTextBox_KeyDown" />
+                            <TextBlock IsHitTestVisible="False"
+                                       Margin="14,0,0,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="13"
+                                       Foreground="{StaticResource FvTextMuted}"
+                                       Text="Type a message...">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Text, ElementName=ComposerTextBox}" Value="">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+
+                        <Button Grid.Column="1"
+                                Style="{StaticResource SendButtonStyle}"
+                                VerticalAlignment="Bottom"
+                                Command="{Binding SendMessageCommand}"
+                                ToolTip="Send (Enter). Shift+Enter for new line." />
+                    </Grid>
+                </Border>
+
+                <!-- Status bar -->
+                <Border Grid.Row="4" Background="{StaticResource FvBgBase}"
+                        Padding="14,4">
+                    <TextBlock FontSize="11"
+                               Foreground="{StaticResource FvTextMuted}"
+                               Text="{Binding StatusMessage}" />
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- Bottom row: nothing additional; status moved into right panel -->
+        <Grid Grid.Row="2" />
+    </Grid>
+</UserControl>
